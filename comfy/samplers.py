@@ -12,6 +12,24 @@ import comfy.conds
 #The main sampling function shared by all the samplers
 #Returns denoised
 def sampling_function(model, x, timestep, uncond, cond, cond_scale, model_options={}, seed=None):
+    """
+    Main sampling function used by all samplers. It applies conditional and unconditional noise models to an input tensor.
+
+    Args:
+        model: The model used for denoising. The exact type is unknown; requires further clarification.
+        x (torch.Tensor): The input tensor to be denoised.
+        timestep (torch.Tensor): The timestep tensor, representing the noise level.
+        uncond: The unconditional component of the model. Type and structure need clarification.
+        cond: The conditional component of the model. Type and structure need clarification.
+        cond_scale (float): Scaling factor for the conditional component.
+        model_options (dict, optional): Additional options for the model. Defaults to {}.
+        seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+    Returns:
+        torch.Tensor: The denoised output tensor.
+    
+    Note: Detailed understanding of 'model', 'uncond', and 'cond' is required for complete documentation.
+    """
         def get_area_and_mult(conds, x_in, timestep_in):
             area = (x_in.shape[2], x_in.shape[3], 0, 0)
             strength = 1.0
@@ -257,6 +275,14 @@ def sampling_function(model, x, timestep, uncond, cond, cond_scale, model_option
             return uncond + (cond - uncond) * cond_scale
 
 class CFGNoisePredictor(torch.nn.Module):
+    """
+    A PyTorch module wrapper for noise prediction in a given model.
+
+    Args:
+        model: The model to be wrapped for noise prediction. Further details required.
+
+    Note: More information about the 'model' and its expected behavior is needed.
+    """
     def __init__(self, model):
         super().__init__()
         self.inner_model = model
