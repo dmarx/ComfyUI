@@ -8,8 +8,17 @@ import numpy as np
 
 def prepare_noise(latent_image, seed, noise_inds=None):
     """
-    creates random noise given a latent image and a seed.
-    optional arg skip can be used to skip and discard x number of noise generations for a given seed
+    Creates random noise given a latent image and a seed. Optionally uses `noise_inds` to generate and select specific noise instances.
+
+    Args:
+        latent_image (torch.Tensor): The latent image tensor used as a reference for noise generation.
+        seed (int): Seed for random number generation to ensure reproducibility.
+        noise_inds (list, optional): Indices to select specific noise instances. If None, generates a single noise instance.
+
+    Returns:
+        torch.Tensor: Tensor of generated noise.
+
+    Note: Clarification needed on the structure and purpose of `noise_inds`.
     """
     generator = torch.manual_seed(seed)
     if noise_inds is None:
@@ -26,7 +35,17 @@ def prepare_noise(latent_image, seed, noise_inds=None):
     return noises
 
 def prepare_mask(noise_mask, shape, device):
-    """ensures noise mask is of proper dimensions"""
+    """
+    Ensures the noise mask is of the proper dimensions matching a given shape.
+
+    Args:
+        noise_mask (torch.Tensor): Initial noise mask.
+        shape (tuple): Target shape to match for the noise mask.
+        device (torch.device): The device to which the noise mask should be moved.
+
+    Returns:
+        torch.Tensor: Noise mask resized to the specified shape and moved to the designated device.
+    """
     noise_mask = torch.nn.functional.interpolate(noise_mask.reshape((-1, 1, noise_mask.shape[-2], noise_mask.shape[-1])), size=(shape[2], shape[3]), mode="bilinear")
     noise_mask = noise_mask.round()
     noise_mask = torch.cat([noise_mask] * shape[1], dim=1)
@@ -35,6 +54,18 @@ def prepare_mask(noise_mask, shape, device):
     return noise_mask
 
 def get_models_from_cond(cond, model_type):
+    """
+    Extracts models of a specific type from a list of conditions.
+
+    Args:
+        cond (list): List of conditions from which to extract models.
+        model_type (str): The type of model to extract.
+
+    Returns:
+        list: A list of models of the specified type extracted from the conditions.
+
+    Note: Need more context on the structure of `cond` and the expected model types.
+    """
     models = []
     for c in cond:
         if model_type in c:
@@ -42,6 +73,17 @@ def get_models_from_cond(cond, model_type):
     return models
 
 def convert_cond(cond):
+    """
+    Converts a list of conditions into a new format, particularly for use in model conditioning.
+
+    Args:
+        cond (list): List of conditions to convert.
+
+    Returns:
+        list: List of converted conditions.
+
+    Note: Detailed explanation of the conversion process and the structure of conditions is needed.
+    """
     out = []
     for c in cond:
         temp = c[1].copy()
@@ -53,7 +95,19 @@ def convert_cond(cond):
     return out
 
 def get_additional_models(positive, negative, dtype):
-    """loads additional models in positive and negative conditioning"""
+    """
+    Loads additional models specified in positive and negative conditions.
+
+    Args:
+        positive (list): List of positive conditions containing model information.
+        negative (list): List of negative conditions containing model information.
+        dtype (torch.dtype): The data type for inference memory calculation.
+
+    Returns:
+        tuple: A tuple containing a list of additional models and the total inference memory requirement.
+
+    Note: Clarification on the structure of `positive` and `negative` lists and the role of `dtype` is required.
+    """
     control_nets = set(get_models_from_cond(positive, "control") + get_models_from_cond(negative, "control"))
 
     inference_memory = 0
@@ -74,6 +128,21 @@ def cleanup_additional_models(models):
             m.cleanup()
 
 def prepare_sampling(model, noise_shape, positive, negative, noise_mask):
+    """
+    Prepares the model and conditions for sampling.
+
+    Args:
+        model: The model to prepare for sampling. More details required.
+        noise_shape (tuple): The shape of the noise to be used.
+        positive (list): List of positive conditions.
+        negative (list): List of negative conditions.
+        noise_mask (torch.Tensor, optional): A noise mask tensor.
+
+    Returns:
+        tuple: A tuple containing the real model, positive conditions, negative conditions, noise mask, and additional models.
+
+    Note: Detailed explanation of how the model and conditions are prepared is needed.
+    """
     device = model.load_device
     positive = convert_cond(positive)
     negative = convert_cond(negative)
