@@ -14,6 +14,22 @@ import nodes
 import comfy.model_management
 
 def get_input_data(inputs, class_def, unique_id, outputs={}, prompt={}, extra_data={}):
+    """
+    Gathers input data for a specific node based on its class definition and inputs.
+
+    Args:
+        inputs (dict): A dictionary of input data where keys are input names and values are input values.
+        class_def: The class definition of the node for which inputs are being gathered.
+        unique_id: Unique identifier for the node.
+        outputs (dict, optional): A dictionary of outputs from previous nodes. Defaults to an empty dict.
+        prompt (dict, optional): A dictionary containing prompt data. Defaults to an empty dict.
+        extra_data (dict, optional): A dictionary containing any additional data required for input processing. Defaults to an empty dict.
+
+    Returns:
+        dict: A dictionary where keys are input names and values are the processed inputs.
+
+    Note: Requires more context about the structure of `class_def` and how it's used to process inputs.
+    """
     valid_inputs = class_def.INPUT_TYPES()
     input_data_all = {}
     for x in inputs:
@@ -43,6 +59,20 @@ def get_input_data(inputs, class_def, unique_id, outputs={}, prompt={}, extra_da
     return input_data_all
 
 def map_node_over_list(obj, input_data_all, func, allow_interrupt=False):
+    """
+    Maps a function over a list of input data for a given node object.
+
+    Args:
+        obj: The node object on which the function will be executed.
+        input_data_all (dict): Dictionary containing input data for the function.
+        func (str): Name of the function to be executed on the node object.
+        allow_interrupt (bool, optional): If True, allows interruption of the node execution process. Defaults to False.
+
+    Returns:
+        list: Results obtained from applying the function to the input data.
+
+    Note: Clarification needed on how the `obj` interacts with `func` and the structure of `input_data_all`.
+    """
     # check if node wants the lists
     input_is_list = False
     if hasattr(obj, "INPUT_IS_LIST"):
@@ -77,7 +107,18 @@ def map_node_over_list(obj, input_data_all, func, allow_interrupt=False):
     return results
 
 def get_output_data(obj, input_data_all):
-    
+    """
+    Retrieves the output data from executing a node object's function with provided inputs.
+
+    Args:
+        obj: The node object whose function is to be executed.
+        input_data_all (dict): Dictionary of input data to pass to the node's function.
+
+    Returns:
+        tuple: A tuple containing the output data and UI information.
+
+    Note: Further details on the expected structure of `obj` and the nature of the output data are required.
+    """
     results = []
     uis = []
     return_values = map_node_over_list(obj, input_data_all, obj.FUNCTION, allow_interrupt=True)
@@ -266,6 +307,14 @@ def recursive_output_delete_if_changed(prompt, old_prompt, outputs, current_item
     return to_delete
 
 class PromptExecutor:
+    """
+    Executor class responsible for handling prompt execution within the Comfy framework.
+
+    Args:
+        server: The server instance associated with the executor.
+
+    This class manages the execution of prompts, error handling during execution, and communication with the server.
+    """
     def __init__(self, server):
         self.outputs = {}
         self.object_storage = {}
@@ -684,6 +733,14 @@ def validate_prompt(prompt):
 MAXIMUM_HISTORY_SIZE = 10000
 
 class PromptQueue:
+    """
+    A queue management class for handling prompt execution tasks.
+
+    Args:
+        server: The server instance associated with the queue.
+
+    This class manages prompt execution tasks, keeps track of execution history, and provides functionalities to modify the task queue.
+    """
     def __init__(self, server):
         self.server = server
         self.mutex = threading.RLock()
