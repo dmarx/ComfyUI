@@ -7,7 +7,24 @@ import folder_paths
 import time
 
 def execute_prestartup_script():
+    """
+    Executes pre-startup scripts for custom nodes. It locates the script in each node's directory and executes it.
+
+    Note: This function assumes a specific directory structure and script naming convention ('prestartup_script.py').
+    More context on the directory structure and the expected behavior of the scripts is needed.
+    """
     def execute_script(script_path):
+        """
+        Executes a Python script from a given path.
+    
+        Args:
+            script_path (str): Path to the Python script to be executed.
+    
+        Returns:
+            bool: True if the script was executed successfully, False otherwise.
+    
+        Note: Error handling is implemented, but detailed logging of the errors for debugging might be beneficial.
+        """
         module_name = os.path.splitext(script_path)[0]
         try:
             spec = importlib.util.spec_from_file_location(module_name, script_path)
@@ -87,6 +104,15 @@ def cuda_malloc_warning():
             print("\nWARNING: this card most likely does not support cuda-malloc, if you get \"CUDA error\" please run ComfyUI with: --disable-cuda-malloc\n")
 
 def prompt_worker(q, server):
+    """
+    A worker function that continuously processes prompt execution tasks from a queue.
+
+    Args:
+        q (queue): The queue containing prompt execution tasks.
+        server: The server instance for communication and task management.
+
+    Note: This function performs prompt execution, garbage collection, and server communication. More information on the structure of the queue items and the server API would be helpful.
+    """
     e = execution.PromptExecutor(server)
     last_gc_collect = 0
     need_gc = False
@@ -121,6 +147,18 @@ def prompt_worker(q, server):
                 need_gc = False
 
 async def run(server, address='', port=8188, verbose=True, call_on_start=None):
+    """
+    Asynchronously runs the server and its associated tasks.
+
+    Args:
+        server: The server instance to be run.
+        address (str): The IP address for the server. Defaults to '' (all interfaces).
+        port (int): The port number for the server. Defaults to 8188.
+        verbose (bool): If True, enables verbose logging. Defaults to True.
+        call_on_start (callable, optional): A function to call on server start. Defaults to None.
+
+    Note: The server's start method and publish_loop need to be explored for a full understanding of their functionalities.
+    """
     await asyncio.gather(server.start(address, port, verbose, call_on_start), server.publish_loop())
 
 
