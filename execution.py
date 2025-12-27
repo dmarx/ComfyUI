@@ -684,7 +684,8 @@ class PromptExecutor:
         self.status_messages = []
         self.add_message("execution_start", { "prompt_id": prompt_id}, broadcast=False)
 
-        ctx = nullcontext() if self.disable_inference_mode else torch.inference_mode()
+        #ctx = nullcontext() if self.disable_inference_mode else torch.inference_mode()
+        ctx = torch.no_grad() if self.disable_inference_mode else torch.inference_mode()
         with ctx:
             dynamic_prompt = DynamicPrompt(prompt)
             reset_progress_state(prompt_id, dynamic_prompt)

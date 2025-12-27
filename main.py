@@ -206,7 +206,7 @@ def prompt_worker(q, server_instance):
         cache_type = execution.CacheType.NONE
 
     disable_inference_mode = getattr(args, "disable_inference_mode", False)
-    if enable_autograd:
+    if disable_inference_mode:
         logging.warning("⚠ --disable-inference-mode set: forcing CacheType.NONE to avoid caching tensors with autograd graphs.")
         cache_type = execution.CacheType.NONE
 
