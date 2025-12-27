@@ -205,7 +205,18 @@ def prompt_worker(q, server_instance):
     elif args.cache_none:
         cache_type = execution.CacheType.NONE
 
-    e = execution.PromptExecutor(server_instance, cache_type=cache_type, cache_args={ "lru" : args.cache_lru, "ram" : args.cache_ram } )
+    disable_inference_mode = getattr(args, "disable_inference_mode", False)
+    if enable_autograd:
+        logging.warning("⚠ --disable-inference-mode set: forcing CacheType.NONE to avoid caching tensors with autograd graphs.")
+        cache_type = execution.CacheType.NONE
+
+    e = execution.PromptExecutor(
+        server_instance,
+        cache_type=cache_type,
+        cache_args={ "lru": args.cache_lru, "ram": args.cache_ram },
+        disable_inference_mode=disable_inference_mode,
+    )
+
     last_gc_collect = 0
     need_gc = False
     gc_collect_interval = 10.0

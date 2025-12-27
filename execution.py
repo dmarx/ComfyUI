@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 import copy
 import heapq
 import inspect
@@ -618,10 +619,11 @@ async def execute(server, dynprompt, caches, current_item, extra_data, executed,
     return (ExecutionResult.SUCCESS, None, None)
 
 class PromptExecutor:
-    def __init__(self, server, cache_type=False, cache_args=None):
+    def __init__(self, server, cache_type=False, cache_args=None, disable_inference_mode=False):
         self.cache_args = cache_args
         self.cache_type = cache_type
         self.server = server
+        self.disable_inference_mode = disable_inference_mode
         self.reset()
 
     def reset(self):
@@ -682,7 +684,8 @@ class PromptExecutor:
         self.status_messages = []
         self.add_message("execution_start", { "prompt_id": prompt_id}, broadcast=False)
 
-        with torch.inference_mode():
+        ctx = nullcontext() if self.disable_inference_mode else torch.inference_mode()
+        with ctx:
             dynamic_prompt = DynamicPrompt(prompt)
             reset_progress_state(prompt_id, dynamic_prompt)
             add_progress_handler(WebUIProgressHandler(self.server))
